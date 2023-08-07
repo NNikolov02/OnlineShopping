@@ -10,13 +10,16 @@ import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
 @Mapper(uses = {ProductMapperDto.class, CustomerMapperDto.class})
 public interface CartMapper {
 
     Cart modelFromCreateRequest(CartCreateRequest cartCreateDto);
 
-    CartResponse responseFromModel(Cart cart);
+    CartResponse responseFromModelOne(Cart cart);
+    List< CartResponse> responseFromModelList(List<Cart> carts);
 
     @Mapping(target = "orderDate",nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "shippingAddress", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
