@@ -63,10 +63,10 @@ public class CartService {
                 (List<Product>) productRepo.findAllById(cartProductsIds);
 
         cart.setProducts(new HashSet<>(allCartProducts));
-        Cart savedEbook = repo.save(cart);
+        Cart savedCart = repo.save(cart);
 
         Set<UUID> allCartProductsIds = new HashSet<>();
-        for (Product product : savedEbook.getProducts()) {
+        for (Product product : savedCart.getProducts()) {
             allCartProductsIds.add(product.getId());
         }
 

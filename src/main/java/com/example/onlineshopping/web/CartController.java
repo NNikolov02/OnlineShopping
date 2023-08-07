@@ -1,8 +1,8 @@
 package com.example.onlineshopping.web;
 
-import com.example.onlineshopping.dto.cart.CartApiPage;
-import com.example.onlineshopping.dto.cart.CartCreateRequest;
-import com.example.onlineshopping.dto.cart.CartResponse;
+import com.example.onlineshopping.dto.cart.*;
+import com.example.onlineshopping.dto.product.SetProductRequest;
+import com.example.onlineshopping.error.InvalidObjectException;
 import com.example.onlineshopping.mapping.CartMapper;
 import com.example.onlineshopping.model.Cart;
 import com.example.onlineshopping.service.CartService;
@@ -14,6 +14,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/onlineStore/carts")
@@ -61,8 +64,10 @@ public class CartController {
     public ResponseEntity<CartResponse> findById(@PathVariable String cartId){
 
         Cart cart = cartService.findById(cartId);
+        CartResponse cartResponse = cartMapper.responseFromModelOne(cart);
+        cartResponse.setUrl("http://localhost:8086/onlineStore/carts/" + cartResponse.getId());
 
-        return ResponseEntity.ok(cartMapper.responseFromModelOne(cart));
+        return ResponseEntity.ok().body(cartResponse);
     }
 
     @DeleteMapping(value ="/{cartId}")
@@ -72,6 +77,11 @@ public class CartController {
 
     @PostMapping("")
     public ResponseEntity<CartResponse>createCart(@RequestBody CartCreateRequest cartDto){
+
+        Map<String, String> validationErrors = validator.validate(cartDto);
+        if (validationErrors.size() != 0) {
+            throw new InvalidObjectException("Invalid Cart Create", validationErrors);
+        }
         Cart create = cartMapper.modelFromCreateRequest(cartDto);
 
         Cart saved = cartService.save(create);
@@ -79,6 +89,39 @@ public class CartController {
         CartResponse cartResponse = cartMapper.responseFromModelOne(saved);
 
         return ResponseEntity.status(201).body(cartResponse);
+    }
+
+    @PatchMapping(value ="/{cartId}")
+    public ResponseEntity<CartResponse>updateCart(@PathVariable String cartId, @RequestBody CartUpdateRequest cartDto){
+        Map<String, String> validationErrors = validator.validate(cartDto);
+        if (validationErrors.size() != 0) {
+            throw new InvalidObjectException("Invalid Cart Update", validationErrors);
+        }
+
+        Cart findCart = cartService.findById(cartId);
+        cartMapper.updateModelFromDto(cartDto, findCart);
+
+        Cart saveCart = cartService.save(findCart);
+
+        CartResponse cartResponse = cartMapper.responseFromModelOne(saveCart);
+
+
+        return ResponseEntity.status(202).body(cartResponse);
+
+
+
+
+    }
+
+
+    @PutMapping(value = "/{cartId}/products")
+    public CartProductsResponse setAllCartProducts(@PathVariable String cartId, @RequestBody SetProductRequest products) {
+
+        Set<UUID> cartsProducts = cartService.setCartProducts(cartId,products.getSetProducts());
+
+        CartProductsResponse result =  CartProductsResponse.builder().CartProductsIds(cartsProducts).build();
+
+        return result;
     }
 
 }
