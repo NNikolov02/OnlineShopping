@@ -34,7 +34,7 @@ public interface CustomerMapper {
 
         if(carts != null){
             for(Cart cart : carts){
-                cartUrls.add("http://localhost:8086/store/carts/" + cart.getId());
+                cartUrls.add("http://localhost:8086/onlineStore/carts/" + cart.getId());
             }
         }
 

@@ -36,7 +36,7 @@ public interface ProductMapper {
 
         if(cart != null){
 
-            return "http://localhost:8086/store/carts/" + cart.getId();
+            return "http://localhost:8086/onlineStore/carts/" + cart.getId();
 
         }
 
