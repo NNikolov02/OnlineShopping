@@ -1,0 +1,178 @@
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product List</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #333;
+            color: #fff;
+            padding: 10px;
+            text-align: center;
+        }
+
+        nav {
+            background-color: #444;
+            padding: 5px;
+            text-align: center;
+        }
+
+        nav ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        nav li {
+            display: inline-block;
+            margin-right: 10px;
+        }
+
+        nav a {
+            color: #fff;
+            text-decoration: none;
+            padding: 5px 10px;
+        }
+
+        main {
+            padding: 20px;
+        }
+
+        .product-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        .product-card {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 10px;
+            width: 30%;
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+        }
+
+        .product-card h3 {
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+
+        .product-card p {
+            margin-bottom: 10px;
+        }
+
+        .product-card .price {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .add-to-cart-btn {
+            background-color: #4CAF50;
+            color: white;
+            padding: 5px 10px;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            border-radius: 5px;
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+        }
+
+        footer {
+            background-color: #444;
+            color: #fff;
+            padding: 5px;
+            text-align: center;
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+<header>
+    <h1>Product List</h1>
+</header>
+
+<nav>
+    <ul>
+        <li><a href="/">Home</a></li>
+        <li><a href="/products">Products</a></li>
+        <li><a href="/cart">Cart</a></li>
+    </ul>
+</nav>
+
+<main>
+    <h2>Product List</h2>
+    <div class="product-container">
+        <!-- Iterate through products using Thymeleaf -->
+        <div th:each="product : ${products}" class="product-card">
+            <h3 th:text="${product.name}"></h3>
+            <p th:text="${product.description}"></p>
+            <p class="price">Price: $<span th:text="${product.price}"></span></p>
+            <!-- Use th:data-* to bind data attributes -->
+            <button class="add-to-cart-btn"
+                    th:data-product-id="${product.id}"
+                    th:data-product-name="${product.name}"
+                    th:data-product-price="${product.price}">Add to Cart</button>
+        </div>
+    </div>
+</main>
+
+<footer>
+    <p>&copy; 2023 My Online Store</p>
+</footer>
+
+<script>
+    // Add event listener to "Add to Cart" buttons
+    const addToCartButtons = document.querySelectorAll('.add-to-cart-btn');
+    addToCartButtons.forEach(button => {
+        button.addEventListener('click', addToCart);
+    });
+
+    // Function to handle adding product to cart
+    function addToCart(event) {
+        const productId = event.target.getAttribute('data-product-id');
+        const productName = event.target.getAttribute('data-product-name');
+        const productPrice = event.target.getAttribute('data-product-price');
+
+        const requestData = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                id: productId,
+                name: productName,
+                price: parseFloat(productPrice) // Convert to float
+            })
+        };
+
+        // Perform AJAX request to add product to cart
+        fetch(`/cart/add`, requestData)
+            .then(response => response.json())
+            .then(data => {
+                // Optionally provide feedback to the user (e.g., notification)
+                console.log(`Product "${productName}" added to cart.`);
+            })
+            .catch(error => {
+                console.error('Error adding product to cart:', error);
+            });
+    }
+</script>
+</body>
+</html>

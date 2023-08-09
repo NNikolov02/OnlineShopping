@@ -6,9 +6,9 @@ import lombok.Getter;
 public class NotFoundObjectException extends OnlineShoppingApiException{
 
     private final String objectClass;
-    private final String id;
+    private final Long id;
 
-    public NotFoundObjectException(String message, String objectClass, String id){
+    public NotFoundObjectException(String message, String objectClass, Long id){
         super(message);
         this.objectClass = objectClass;
         this.id = id;

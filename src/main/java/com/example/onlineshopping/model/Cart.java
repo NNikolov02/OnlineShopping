@@ -1,37 +1,28 @@
 package com.example.onlineshopping.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.persistence.*;
-import lombok.*;
+import com.example.onlineshopping.model.Product;
 
-import java.time.LocalDateTime;
-import java.util.Set;
-import java.util.UUID;
+import java.util.ArrayList;
+import java.util.List;
 
-@Entity
-@Data
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
 public class Cart {
+    private List<Product> products = new ArrayList<>();
 
-    @Id
-    @GeneratedValue
-    @Setter(AccessLevel.NONE)
-    @JsonProperty("id")
-    private UUID id;
+    public List<Product> getProducts() {
+        return products;
+    }
 
-    private LocalDateTime orderDate;
-    private String shippingAddress;
-    private String url;
+    public void addProduct(Product product) {
+        products.add(product);
+    }
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinColumn(name = "cart_id_product")
-    @JsonIgnoreProperties("cart")
-    private Set<Product> products;
+    public void removeProduct(Product product) {
+        products.remove(product);
+    }
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "customer_id")
-    private Customer customer;
+    public void clearCart() {
+        products.clear();
+    }
+
+    // Add other methods as needed, e.g., getTotalPrice, isEmpty, etc.
 }

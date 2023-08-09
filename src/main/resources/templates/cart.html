@@ -1,0 +1,146 @@
+<!-- cart.html template -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Your Cart</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    header {
+      background-color: #333;
+      color: #fff;
+      padding: 10px;
+      text-align: center;
+    }
+
+    nav {
+      background-color: #444;
+      padding: 5px;
+      text-align: center;
+    }
+
+    nav ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    nav li {
+      display: inline-block;
+      margin-right: 10px;
+    }
+
+    nav a {
+      color: #fff;
+      text-decoration: none;
+      padding: 5px 10px;
+    }
+
+    main {
+      padding: 20px;
+    }
+
+    footer {
+      background-color: #444;
+      color: #fff;
+      padding: 5px;
+      text-align: center;
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+    }
+
+    .cart-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      margin-top: 20px;
+    }
+
+    .cart-item {
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      padding: 10px;
+      width: 30%;
+      margin-bottom: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+    }
+
+    .cart-item h3 {
+      font-size: 18px;
+      margin-bottom: 5px;
+    }
+
+    .cart-item p {
+      margin-bottom: 10px;
+    }
+
+    .cart-item .price {
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    .remove-btn {
+      background-color: #f44336;
+      color: white;
+      padding: 5px 10px;
+      border: none;
+      cursor: pointer;
+      font-size: 14px;
+      border-radius: 5px;
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+    }
+
+    .checkout-btn {
+      background-color: #4CAF50;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      cursor: pointer;
+      font-size: 16px;
+      border-radius: 5px;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+<header>
+  <h1>Your Cart</h1>
+</header>
+
+<nav>
+  <ul>
+    <li><a href="/">Home</a></li>
+    <li><a href="/products">Products</a></li>
+    <li><a href="/cart">Cart</a></li>
+  </ul>
+</nav>
+
+<main>
+  <div class="cart-container">
+    <div th:each="product : ${cart.products}" class="cart-item">
+      <h3 th:text="${product.name}"></h3>
+      <p th:text="${product.description}"></p>
+      <p class="price">Price: $<span th:text="${product.price}"></span></p>
+      <button class="remove-btn">Remove</button>
+    </div>
+  </div>
+  <button class="checkout-btn">Proceed to Checkout</button>
+</main>
+
+<footer>
+  <p>&copy; 2023 Your Online Store</p>
+</footer>
+</body>
+</html>

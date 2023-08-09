@@ -15,17 +15,17 @@ import java.util.UUID;
 public class Product {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Setter(AccessLevel.NONE)
     @JsonProperty("id")
-    private UUID id;
+    private Long id;
 
     private String title;
     private String description;
 
     private double price;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "cart_id")
-    private Cart cart;
+    private String name;
+
+
 }

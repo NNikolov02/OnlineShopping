@@ -16,21 +16,15 @@ import java.util.UUID;
 public class Customer {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Setter(AccessLevel.NONE)
     @JsonProperty("id")
-    private UUID id;
+    private Long id;
 
     private String customer_name;
 
     private String email;
 
     private String password;
-
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinColumn(name = "customer_id_cart")
-    @JsonIgnoreProperties("customer")
-    private Set<Cart> carts;
-
 
 }

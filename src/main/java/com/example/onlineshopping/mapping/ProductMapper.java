@@ -31,15 +31,15 @@ public interface ProductMapper {
     @Mapping(target = "price", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void updateModelFromDto(ProductUpdateRequest productUpdateDto, @MappingTarget Product product);
 
-    public static String cartUrlFromProducts(Cart cart){
-
-
-        if(cart != null){
-
-            return "http://localhost:8086/onlineStore/carts/" + cart.getId();
-
-        }
-
-        return null;
-    }
+//    public static String cartUrlFromProducts(Cart cart){
+//
+//
+//        if(cart != null){
+//
+//            return "http://localhost:8086/onlineStore/carts/" + cart.getId();
+//
+//        }
+//
+//        return null;
+//    }
 }

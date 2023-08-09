@@ -29,15 +29,15 @@ public interface CustomerMapper {
     @Mapping(target = "password", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void updateModelFromDto(CustomerUpdateRequest customerUpdateDto, @MappingTarget Customer customer);
 
-    public static Set<String> cartUrlsFromCustomer(Set<Cart> carts){
-        Set<String> cartUrls = new HashSet<>();
-
-        if(carts != null){
-            for(Cart cart : carts){
-                cartUrls.add("http://localhost:8086/onlineStore/carts/" + cart.getId());
-            }
-        }
-
-        return cartUrls;
-    }
+//    public static Set<String> cartUrlsFromCustomer(Set<Cart> carts){
+//        Set<String> cartUrls = new HashSet<>();
+//
+//        if(carts != null){
+//            for(Cart cart : carts){
+//                cartUrls.add("http://localhost:8086/onlineStore/carts/" + cart.getId());
+//            }
+//        }
+//
+//        return cartUrls;
+//    }
 }

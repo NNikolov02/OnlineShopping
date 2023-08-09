@@ -16,15 +16,15 @@ import java.util.UUID;
 @Data
 @Builder
 public class CartResponse {
-    private UUID id;
-
-    private LocalDateTime orderDate;
-    private String shippingAddress;
-    private String url;
+//    private UUID id;
+//
+//    private LocalDateTime orderDate;
+//    private String shippingAddress;
+//    private String url;
 
 
     private Set<ProductDto> products;
 
 
-    private CustomerDto customer;
+//    private CustomerDto customer;
 }

@@ -9,5 +9,5 @@ import java.util.UUID;
 @Data
 public class SetProductRequest {
     @NotNull
-    Set<UUID> setProducts;
+    Set<Long> setProducts;
 }
