@@ -1,9 +1,6 @@
 package com.example.onlineshopping.dto.product;
 
-import com.example.onlineshopping.model.Cart;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import com.example.onlineshopping.dto.PhotoDto;
 import lombok.Builder;
 import lombok.Data;
 
@@ -20,5 +17,7 @@ public class ProductResponse {
     private double price;
 
 
-    private String cart;
+
+
+    private PhotoDto photo;
 }

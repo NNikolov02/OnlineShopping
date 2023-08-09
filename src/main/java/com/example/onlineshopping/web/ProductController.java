@@ -1,15 +1,12 @@
 package com.example.onlineshopping.web;
 
-import com.example.onlineshopping.dto.cart.CartResponse;
-import com.example.onlineshopping.dto.cart.CartUpdateRequest;
+import com.example.onlineshopping.dto.PhotoDto;
 import com.example.onlineshopping.dto.product.ProductApiPage;
 import com.example.onlineshopping.dto.product.ProductCreateRequest;
 import com.example.onlineshopping.dto.product.ProductResponse;
 import com.example.onlineshopping.dto.product.ProductUpdateRequest;
 import com.example.onlineshopping.error.InvalidObjectException;
 import com.example.onlineshopping.mapping.ProductMapper;
-import com.example.onlineshopping.mapping.ProductMapperDto;
-import com.example.onlineshopping.model.Cart;
 import com.example.onlineshopping.model.Product;
 import com.example.onlineshopping.service.ProductService;
 import com.example.onlineshopping.validation.ObjectValidator;
@@ -18,7 +15,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.Map;
 
 @RestController
@@ -59,7 +58,7 @@ public class ProductController {
     }
 
 
-    @GetMapping(value = "/{title}")
+    @GetMapping(value = "/title/{title}")
     public ResponseEntity<ProductResponse>findByTitle(@PathVariable String title){
 
         Product product =productService.findByTitle(title);
@@ -68,7 +67,7 @@ public class ProductController {
     }
 
 
-    @GetMapping(value = "/{description}")
+    @GetMapping(value = "/description/{description}")
     public ResponseEntity<ProductResponse>findByDescription(@PathVariable String description){
 
         Product product = productService.findByDescription(description);
@@ -81,9 +80,21 @@ public class ProductController {
         productService.deleteById(productId);
     }
 
-    @PostMapping("")
-    public ResponseEntity<ProductResponse>createProduct(@RequestBody ProductCreateRequest productDto){
+    @PostMapping("/with-photo")
+    public ResponseEntity<ProductResponse>createProduct(@RequestBody ProductCreateRequest productDto,@RequestBody MultipartFile photoFile,@RequestBody PhotoDto photoDto){
 
+
+        if (photoFile != null && !photoFile.isEmpty()) {
+
+            photoDto.setOriginalFilename(photoFile.getOriginalFilename());
+            photoDto.setContentType(photoFile.getContentType());
+            try {
+                photoDto.setContent(photoFile.getBytes());
+            } catch (IOException e) {
+                throw new RuntimeException("Error processing photo upload", e);
+            }
+            productDto.setPhoto(photoDto);
+        }
         Map<String, String> validationErrors = validator.validate(productDto);
         if (validationErrors.size() != 0) {
             throw new InvalidObjectException("Invalid Product Create", validationErrors);

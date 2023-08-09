@@ -43,7 +43,7 @@ public class CartController {
         Page<CartResponse> cartPage = cartService.fetchAll(currPage - 1, 10).map(cartMapper::responseFromModelOne);
 
         for (CartResponse response : cartPage){
-            response.setUrl("http://localhost:8086/swapi/films/" + response.getId());
+            response.setUrl("http://localhost:8086/onlieStore/carts/" + response.getId());
         }
 
         return new CartApiPage<>(cartPage);

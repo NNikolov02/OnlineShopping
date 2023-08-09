@@ -1,5 +1,6 @@
 package com.example.onlineshopping.dto.product;
 
+import com.example.onlineshopping.dto.PhotoDto;
 import lombok.Builder;
 import lombok.Data;
 
@@ -11,4 +12,5 @@ public class ProductUpdateRequest {
     private String description;
 
     private double price;
+    private PhotoDto photo;
 }
