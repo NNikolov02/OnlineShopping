@@ -10,12 +10,18 @@ import com.example.onlineshopping.model.Customer;
 import com.example.onlineshopping.model.Product;
 import com.example.onlineshopping.service.CustomerService;
 import com.example.onlineshopping.validation.ObjectValidator;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -33,6 +39,8 @@ public class CustomerController {
 
     @Autowired
     private ObjectValidator validator;
+    @Autowired
+    private ApplicationEventPublisher eventPublisher;
 
     private final Integer Page_Size = 10;
 
@@ -44,6 +52,9 @@ public class CustomerController {
 
         Page<CustomerResponse> customersPage =customerService.fetchAll(currPage, Page_Size)
                 .map(customerMapper::responseFromModel);
+        for(CustomerResponse response:customersPage){
+            response.setUrl("http://localhost:8086/onlineStore/customers/" + response.getName());
+        }
 
         return new CustomerApiPage<>(customersPage);
     }
@@ -52,9 +63,18 @@ public class CustomerController {
     public ResponseEntity<CustomerResponse> findById(@PathVariable String customerId){
 
         Customer customer = customerService.findById(customerId);
+        CustomerResponse customerResponse = customerMapper.responseFromModel(customer);
+        customerResponse.setUrl("http://localhost:8086/onlineStore/customers/" + customerResponse.getName());
 
+        return ResponseEntity.ok().body(customerResponse);
+    }
+    @GetMapping("/name/{customerName}")
+    public ResponseEntity<CustomerResponse>findByName(@PathVariable String customerName){
+        Customer customer = customerService.findByName(customerName);
+        CustomerResponse customerResponse = customerMapper.responseFromModel(customer);
+        customerResponse.setUrl("http://localhost:8086/onlineStore/customers/" + customerResponse.getName());
 
-        return ResponseEntity.ok(customerMapper.responseFromModel(customer));
+        return ResponseEntity.ok().body(customerResponse);
     }
 
 
@@ -64,22 +84,30 @@ public class CustomerController {
         customerService.deleteById(customerId);
     }
 
-    @PostMapping("")
-    public ResponseEntity<CustomerResponse>createProduct(@RequestBody CustomerCreateRequest customerDto){
+    @DeleteMapping(value ="/name/{name}")
+    public void deleteByName(@PathVariable String name){
+        customerService.deleteByName(name);
+    }
 
-        Map<String, String> validationErrors = validator.validate(customerDto);
-        if (validationErrors.size() != 0) {
-            throw new InvalidObjectException("Invalid Customer Create", validationErrors);
-        }
-
-        Customer createCustomer = customerMapper.modelFromCreateRequest(customerDto);
-
-        Customer savedCustomer = customerService.save(createCustomer);
-
-        CustomerResponse customerResponse = customerMapper.responseFromModel(savedCustomer);
+    @PostMapping("/registration")
+    public ResponseEntity<String> createUserAndRegister(
+            @RequestBody @Valid CustomerCreateRequest customerDto,
+            HttpServletRequest request, Errors errors) {
 
 
-        return  ResponseEntity.status(201).body(customerResponse);
+        Customer registered = customerService.registerNewCustomerAccount(customerDto);
+
+        String appUrl = request.getContextPath();
+        eventPublisher.publishEvent(new OnRegistrationCompleteEvent(registered,
+                request.getLocale(), appUrl));
+
+        CustomerResponse customerResponse = customerMapper.responseFromModel(registered);
+
+
+
+
+        return new ResponseEntity<>("Registration Successfully!", HttpStatus.CREATED);
+
     }
 
     @PatchMapping(value ="/{customerId}")
@@ -104,13 +132,13 @@ public class CustomerController {
 
     }
 
-    @PutMapping(value = "/{customerId}/carts")
-    public CustomerCartResponse setAllCustomerCarts(@PathVariable String customerId, @RequestBody SetCartRequest carts) {
+    //@PutMapping(value = "/{customerId}/carts")
+    //public CustomerCartResponse setAllCustomerCarts(@PathVariable String customerId, @RequestBody SetCartRequest carts) {
 
-        Set<UUID> customerCarts = customerService.setCustomerCarts(customerId,carts.getSetCarts());
+        //Set<UUID> customerCarts = customerService.setCustomerCarts(customerId,carts.getSetCarts());
 
-        CustomerCartResponse result =  CustomerCartResponse.builder().CustomerCartIds(customerCarts).build();
+       // CustomerCartResponse result =  CustomerCartResponse.builder().CustomerCartIds(customerCarts).build();
 
-        return result;
-    }
+       // return result;
+    //}
 }

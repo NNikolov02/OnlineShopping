@@ -21,14 +21,14 @@ public class CustomerResponse {
 
     private UUID id;
 
-    private String customer_name;
+    private String name;
 
     private String email;
 
     private String password;
 
 
-    private Set<String> carts;
+    private String url;
 
 
 }

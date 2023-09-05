@@ -24,7 +24,7 @@ public class Product {
     private String title;
     private String description;
 
-    private double price;
+    private Double price;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cart_id")
@@ -34,4 +34,24 @@ public class Product {
     @JoinColumn(name = "photo_id", referencedColumnName = "id")
     @JsonIgnoreProperties("product")
     private Photo photo;
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+
+        // Hash code based on the product's ID
+        result = prime * result + ((id == null) ? 0 : id.hashCode());
+
+        // Include the hash code of the associated entities (Cart and Photo) if they are not null
+        if (cart != null) {
+            result = prime * result + cart.hashCode();
+        }
+
+        if (photo != null) {
+            result = prime * result + photo.hashCode();
+        }
+
+        return result;
+    }
 }

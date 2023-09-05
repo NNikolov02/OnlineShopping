@@ -1,10 +1,12 @@
 package com.example.onlineshopping.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -21,16 +23,16 @@ public class Customer {
     @JsonProperty("id")
     private UUID id;
 
-    private String customer_name;
+    private String name;
 
     private String email;
 
     private String password;
+    private  String url;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinColumn(name = "customer_id_cart")
-    @JsonIgnoreProperties("customer")
-    private Set<Cart> carts;
+    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
+    @JsonBackReference
+    private List<Cart> carts;
 
 
 }

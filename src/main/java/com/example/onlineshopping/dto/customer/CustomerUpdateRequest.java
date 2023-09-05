@@ -7,7 +7,7 @@ import lombok.Data;
 @Builder
 public class CustomerUpdateRequest {
 
-    private String customer_name;
+    private String name;
 
     private String email;
 

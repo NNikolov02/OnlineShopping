@@ -9,6 +9,7 @@ import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Data;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.UUID;
@@ -18,13 +19,15 @@ import java.util.UUID;
 public class CartResponse {
     private UUID id;
 
-    private LocalDateTime orderDate;
+    private LocalDate orderDate;
     private String shippingAddress;
     private String url;
 
 
     private Set<ProductDto> products;
 
+    private Double totalPrice;
 
-    private CustomerDto customer;
+
+    private String customer;
 }

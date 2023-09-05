@@ -3,9 +3,11 @@ package com.example.onlineshopping.service;
 import com.example.onlineshopping.dto.cart.CartResponse;
 import com.example.onlineshopping.error.NotFoundObjectException;
 import com.example.onlineshopping.model.Cart;
+import com.example.onlineshopping.model.Customer;
 import com.example.onlineshopping.model.Product;
 import com.example.onlineshopping.repository.CartPagingRepository;
 import com.example.onlineshopping.repository.CartRepository;
+import com.example.onlineshopping.repository.CustomerRepository;
 import com.example.onlineshopping.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -30,6 +32,8 @@ public class CartService {
 
     @Autowired
     private ProductRepository productRepo;
+    @Autowired
+    private CustomerRepository customerRepo;
 
     public Page<Cart> fetchAll(int currentPage, int pageSize) {
         return pagingRepo.findAll(PageRequest.of(currentPage, pageSize));
@@ -54,23 +58,27 @@ public class CartService {
         return repo.findByCustomersName(customerName);
     }
 
-    public Set<UUID> setCartProducts(String cartId, Set<UUID> cartProductsIds) {
-        Cart cart = repo.findById(UUID.fromString(cartId)).orElseThrow(() -> {
-            throw new NotFoundObjectException("Cart Not Found", Cart.class.getName(),cartId);
-        });
+    public String setCartProducts(String name, String title) {
+        Cart cart = repo.findByCustomer_Name(name);
+
+
 
         List<Product> allCartProducts =
-                (List<Product>) productRepo.findAllById(cartProductsIds);
+                (List<Product>) productRepo.findAllByTitle(title);
 
         cart.setProducts(new HashSet<>(allCartProducts));
+        for(Product product:allCartProducts) {
+            cart.setTotalPrice(0.0);
+            cart.setTotalPrice(cart.getTotalPrice() + product.getPrice());
+        }
         Cart savedCart = repo.save(cart);
 
-        Set<UUID> allCartProductsIds = new HashSet<>();
-        for (Product product : savedCart.getProducts()) {
-            allCartProductsIds.add(product.getId());
-        }
+        //Set<UUID> allCartProductsIds = new HashSet<>();
+        //for (Product product : savedCart.getProducts()) {
+           // allCartProductsIds.add(product.getId());
+       // }
 
-        return allCartProductsIds;
+        return "The product is chosen!";
     }
 
 }

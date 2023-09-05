@@ -24,7 +24,7 @@ public interface CustomerMapper {
 
     CustomerResponse responseFromModel(Customer customer);
 
-    @Mapping(target = "customer_name",nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "name",nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "email", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "password", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void updateModelFromDto(CustomerUpdateRequest customerUpdateDto, @MappingTarget Customer customer);

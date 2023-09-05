@@ -81,19 +81,19 @@ public class ProductController {
     }
 
     @PostMapping("/with-photo")
-    public ResponseEntity<ProductResponse>createProduct(@RequestBody ProductCreateRequest productDto,@RequestBody MultipartFile photoFile,@RequestBody PhotoDto photoDto){
+    public ResponseEntity<ProductResponse>createProduct(@RequestBody ProductCreateRequest productDto,@RequestBody MultipartFile photoFile){
 
 
         if (photoFile != null && !photoFile.isEmpty()) {
 
-            photoDto.setOriginalFilename(photoFile.getOriginalFilename());
-            photoDto.setContentType(photoFile.getContentType());
+            productDto.getPhoto().setOriginalFilename(photoFile.getOriginalFilename());
+            productDto.getPhoto().setContentType(photoFile.getContentType());
             try {
-                photoDto.setContent(photoFile.getBytes());
+                productDto.getPhoto().setContent(photoFile.getBytes());
             } catch (IOException e) {
                 throw new RuntimeException("Error processing photo upload", e);
             }
-            productDto.setPhoto(photoDto);
+            productDto.setPhoto(productDto.getPhoto());
         }
         Map<String, String> validationErrors = validator.validate(productDto);
         if (validationErrors.size() != 0) {

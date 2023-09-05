@@ -9,5 +9,5 @@ import java.util.UUID;
 @Data
 @Builder
 public class CartProductsResponse {
-    private Set<UUID> CartProductsIds;
+    private String CartProducts;
 }

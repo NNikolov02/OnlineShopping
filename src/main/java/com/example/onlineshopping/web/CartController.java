@@ -1,10 +1,14 @@
 package com.example.onlineshopping.web;
 
+import com.example.onlineshopping.dto.ProductDto;
 import com.example.onlineshopping.dto.cart.*;
 import com.example.onlineshopping.dto.product.SetProductRequest;
 import com.example.onlineshopping.error.InvalidObjectException;
 import com.example.onlineshopping.mapping.CartMapper;
 import com.example.onlineshopping.model.Cart;
+import com.example.onlineshopping.model.Customer;
+import com.example.onlineshopping.model.Product;
+import com.example.onlineshopping.repository.CustomerRepository;
 import com.example.onlineshopping.service.CartService;
 import com.example.onlineshopping.validation.ObjectValidator;
 import lombok.AllArgsConstructor;
@@ -13,10 +17,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.*;
 
 @RestController
 @RequestMapping("/onlineStore/carts")
@@ -31,24 +34,29 @@ public class CartController {
 
     @Autowired
     private ObjectValidator validator;
+    @Autowired
+    private CustomerRepository customerRepo;
 
 
-
-
-    @GetMapping(name = "", produces = "application/json")
+    @GetMapping(value = "", produces = "application/json")
     public CartApiPage<CartResponse> getAllCarts(
-            @RequestParam(required = false, defaultValue = "1") Integer currPage) {
+            @RequestParam(required = false, defaultValue = "1") Integer currPage,
+            @RequestParam(required = false) String name) {
 
 
         Page<CartResponse> cartPage = cartService.fetchAll(currPage - 1, 10).map(cartMapper::responseFromModelOne);
 
-        for (CartResponse response : cartPage){
+        for (CartResponse response : cartPage) {
+
             response.setUrl("http://localhost:8086/onlieStore/carts/" + response.getId());
+
+
         }
-
         return new CartApiPage<>(cartPage);
-
     }
+
+
+
 
     @GetMapping(value ="customer/{customerName}")
     public ResponseEntity<List<CartResponse>> findByCustomer(@PathVariable String customerName ){
@@ -64,8 +72,12 @@ public class CartController {
     public ResponseEntity<CartResponse> findById(@PathVariable String cartId){
 
         Cart cart = cartService.findById(cartId);
+        Customer customer = cart.getCustomer();
+        Set<Product>products = cart.getProducts();
         CartResponse cartResponse = cartMapper.responseFromModelOne(cart);
         cartResponse.setUrl("http://localhost:8086/onlineStore/carts/" + cartResponse.getId());
+        cartResponse.setCustomer("http://localhost:8086/onlineStore/customers/" + customer.getName());
+
 
         return ResponseEntity.ok().body(cartResponse);
     }
@@ -75,22 +87,33 @@ public class CartController {
         cartService.deleteById(cartId);
     }
 
-    @PostMapping("")
-    public ResponseEntity<CartResponse>createCart(@RequestBody CartCreateRequest cartDto){
-
+    @PostMapping("create/{name}")
+    public ResponseEntity<CartResponse> createCart(@RequestBody CartCreateRequest cartDto, @PathVariable String name) {
         Map<String, String> validationErrors = validator.validate(cartDto);
         if (validationErrors.size() != 0) {
             throw new InvalidObjectException("Invalid Cart Create", validationErrors);
         }
-        Cart create = cartMapper.modelFromCreateRequest(cartDto);
 
-        Cart saved = cartService.save(create);
 
-        CartResponse cartResponse = cartMapper.responseFromModelOne(saved);
+        Customer existingCustomer = customerRepo.findCustomerByName(name);
 
-        return ResponseEntity.status(201).body(cartResponse);
+        if (existingCustomer != null) {
+            Cart create = cartMapper.modelFromCreateRequest(cartDto);
+            create.setOrderDate(LocalDate.now());
+            create.setCustomer(existingCustomer);
+
+            existingCustomer.getCarts().add(create);
+
+            Cart saved = cartService.save(create);
+
+            CartResponse cartResponse = cartMapper.responseFromModelOne(saved);
+            cartResponse.setCustomer("http://localhost:8086/onlineStore/customers/name/" + existingCustomer.getName());
+
+            return ResponseEntity.status(201).body(cartResponse);
+        }
+
+        return ResponseEntity.noContent().build();
     }
-
     @PatchMapping(value ="/{cartId}")
     public ResponseEntity<CartResponse>updateCart(@PathVariable String cartId, @RequestBody CartUpdateRequest cartDto){
         Map<String, String> validationErrors = validator.validate(cartDto);
@@ -114,12 +137,12 @@ public class CartController {
     }
 
 
-    @PutMapping(value = "/{cartId}/products")
-    public CartProductsResponse setAllCartProducts(@PathVariable String cartId, @RequestBody SetProductRequest products) {
+    @PutMapping(value = "/{customerName}/products")
+    public CartProductsResponse setAllCartProducts(@PathVariable String customerName, @RequestBody SetProductRequest products) {
 
-        Set<UUID> cartsProducts = cartService.setCartProducts(cartId,products.getSetProducts());
+        String cartsProducts = cartService.setCartProducts(customerName,products.getSetProducts());
 
-        CartProductsResponse result =  CartProductsResponse.builder().CartProductsIds(cartsProducts).build();
+        CartProductsResponse result =  CartProductsResponse.builder().CartProducts(cartsProducts).build();
 
         return result;
     }

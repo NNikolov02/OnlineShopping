@@ -7,12 +7,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 @Data
 @Builder
-public class ProductCreateRequest {
+public class ProductWithPhotoRequest {
 
-    private String title;
-    private String description;
-
-    private double price;
-    private PhotoDto photo;
     private MultipartFile photoFile;
+    private PhotoDto photoDto;
 }
